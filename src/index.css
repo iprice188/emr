@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-gray-900;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Better touch targets for mobile */
+  button, a, input, select, textarea {
+    @apply min-h-[44px];
+  }
+
+  /* Prevent zoom on input focus for iOS */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  /* Primary button */
+  .btn-primary {
+    @apply bg-black text-white px-6 py-3 rounded-lg font-medium active:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply bg-gray-100 text-black px-6 py-3 rounded-lg font-medium active:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-white rounded-lg shadow-md p-4;
+  }
+
+  /* Input field */
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent;
+  }
+
+  /* Status badges */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-draft {
+    @apply bg-gray-100 text-gray-700;
+  }
+
+  .badge-quoting {
+    @apply bg-blue-100 text-blue-700;
+  }
+
+  .badge-quoted {
+    @apply bg-blue-100 text-blue-700;
+  }
+
+  .badge-accepted {
+    @apply bg-orange-100 text-orange-700;
+  }
+
+  .badge-in_progress {
+    @apply bg-orange-100 text-orange-700;
+  }
+
+  .badge-complete {
+    @apply bg-green-100 text-green-700;
+  }
+
+  .badge-invoiced {
+    @apply bg-purple-100 text-purple-700;
+  }
+
+  .badge-paid {
+    @apply bg-green-100 text-green-700;
+  }
+}
