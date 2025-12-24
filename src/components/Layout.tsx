@@ -16,9 +16,13 @@ export default function Layout() {
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
       <header className="bg-black text-white sticky top-0 z-10 shadow-lg">
-        <div className="px-4 py-4">
+        <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold">EMR Business Manager</h1>
+            <img
+              src="/docs/branding/SVG/EMR.svg"
+              alt="EMR"
+              className="h-10"
+            />
             <button
               onClick={handleSignOut}
               className="text-sm text-gray-300 hover:text-white"
