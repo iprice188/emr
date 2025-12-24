@@ -19,7 +19,7 @@ export default function Layout() {
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             <img
-              src="/docs/branding/SVG/EMR.svg"
+              src="/emr-logo.svg"
               alt="EMR"
               className="h-12 w-auto"
             />
