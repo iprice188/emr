@@ -21,7 +21,7 @@ export default function Layout() {
             <img
               src="/docs/branding/SVG/EMR.svg"
               alt="EMR"
-              className="h-10"
+              className="h-12 w-auto"
             />
             <button
               onClick={handleSignOut}
