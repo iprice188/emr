@@ -134,7 +134,7 @@ export default function JobDetail() {
     return colors[status] || 'bg-gray-100 text-gray-700'
   }
 
-  const formatDate = (date: string | null) => {
+  const formatDate = (date: string | null | undefined) => {
     if (!date) return '-'
     return new Date(date).toLocaleDateString()
   }
@@ -359,10 +359,10 @@ export default function JobDetail() {
               £{(job.subtotal || 0).toFixed(2)}
             </span>
           </div>
-          {job.vat_amount > 0 && (
+          {job.vat_amount && job.vat_amount > 0 && (
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">VAT (20%):</span>
-              <span>£{(job.vat_amount || 0).toFixed(2)}</span>
+              <span>£{job.vat_amount.toFixed(2)}</span>
             </div>
           )}
           <div className="flex justify-between text-lg pt-2 border-t font-semibold">

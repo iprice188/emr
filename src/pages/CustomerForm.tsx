@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
-import type { Customer } from '@/types/database'
 
 export default function CustomerForm() {
   const navigate = useNavigate()

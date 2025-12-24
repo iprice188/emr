@@ -13,7 +13,7 @@ export default function Settings() {
     phone: '',
     email: '',
     address: '',
-    default_day_rate: null,
+    default_day_rate: undefined,
     vat_registered: false,
     vat_number: '',
     bank_details: '',
