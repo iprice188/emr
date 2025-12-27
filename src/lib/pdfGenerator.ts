@@ -3,6 +3,18 @@ import type { Job, Customer, Settings } from '@/types/database'
 
 type JobWithCustomer = Job & { customer: Customer }
 
+// Helper function to load image as base64
+const loadImageAsBase64 = async (url: string): Promise<string> => {
+  const response = await fetch(url)
+  const blob = await response.blob()
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+}
+
 export const generateQuotePDF = async (
   job: JobWithCustomer,
   settings: Settings
@@ -10,6 +22,14 @@ export const generateQuotePDF = async (
   const pdf = new jsPDF()
   const pageWidth = pdf.internal.pageSize.getWidth()
   let yPos = 20
+
+  // Add logo at top right
+  try {
+    const logoData = await loadImageAsBase64('/emr-logo.png')
+    pdf.addImage(logoData, 'PNG', pageWidth - 60, 10, 50, 0) // Auto height
+  } catch (error) {
+    console.error('Failed to load logo:', error)
+  }
 
   // Header - Business Info
   pdf.setFontSize(20)
@@ -226,6 +246,14 @@ export const generateInvoicePDF = async (
   const pdf = new jsPDF()
   const pageWidth = pdf.internal.pageSize.getWidth()
   let yPos = 20
+
+  // Add logo at top right
+  try {
+    const logoData = await loadImageAsBase64('/emr-logo.png')
+    pdf.addImage(logoData, 'PNG', pageWidth - 60, 10, 50, 0) // Auto height
+  } catch (error) {
+    console.error('Failed to load logo:', error)
+  }
 
   // Header - Business Info
   pdf.setFontSize(20)
