@@ -89,14 +89,10 @@ export const generateQuotePDF = async (
     })
   }
 
-  // Dates
+  // Quote Date
   yPos += 10
   if (job.quote_date) {
     pdf.text(`Quote Date: ${new Date(job.quote_date).toLocaleDateString()}`, 20, yPos)
-    yPos += 5
-  }
-  if (job.quote_valid_until) {
-    pdf.text(`Valid Until: ${new Date(job.quote_valid_until).toLocaleDateString()}`, 20, yPos)
     yPos += 5
   }
 
@@ -209,8 +205,11 @@ export const generateQuotePDF = async (
   yPos += 10
   pdf.setFontSize(9)
   pdf.setFont('helvetica', 'italic')
-  pdf.text('This quotation is valid for the period stated above.', 20, yPos)
-  yPos += 5
+  if (job.quote_date) {
+    const quoteDate = new Date(job.quote_date).toLocaleDateString()
+    pdf.text(`Valid for 30 days from ${quoteDate}`, 20, yPos)
+    yPos += 5
+  }
   pdf.text('Payment terms and conditions apply upon acceptance.', 20, yPos)
 
   return pdf
@@ -273,6 +272,10 @@ export const generateInvoicePDF = async (
   yPos += 10
   if (job.invoice_date) {
     pdf.text(`Invoice Date: ${new Date(job.invoice_date).toLocaleDateString()}`, 20, yPos)
+    yPos += 6
+  }
+  if (job.quote_date) {
+    pdf.text(`Quote Date: ${new Date(job.quote_date).toLocaleDateString()}`, 20, yPos)
     yPos += 6
   }
 

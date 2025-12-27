@@ -61,8 +61,42 @@ export default function JobDetail() {
     setGeneratingPDF(true)
 
     try {
-      const pdf = await generateQuotePDF(job, settings)
-      downloadPDF(pdf, `Quote-${job.invoice_number || job.id}-${job.customer.name}.pdf`)
+      // Set quote date and valid until if not already set
+      let updatedJob = job
+      if (!job.quote_date || ['draft', 'quoting'].includes(job.status)) {
+        const quoteDate = job.quote_date || new Date().toISOString()
+        const validUntil = new Date()
+        validUntil.setDate(validUntil.getDate() + 30)
+
+        const updates: Partial<Job> = {
+          quote_date: quoteDate,
+          quote_valid_until: validUntil.toISOString(),
+        }
+
+        // Update status to quoted if currently draft or quoting
+        if (['draft', 'quoting'].includes(job.status)) {
+          updates.status = 'quoted'
+        }
+
+        const { data, error } = await supabase
+          .from('jobs')
+          .update(updates)
+          .eq('id', job.id)
+          .select(`
+            *,
+            customer:customers(*)
+          `)
+          .single()
+
+        if (error) throw error
+        if (data) {
+          updatedJob = data as JobWithCustomer
+          setJob(updatedJob)
+        }
+      }
+
+      const pdf = await generateQuotePDF(updatedJob, settings)
+      downloadPDF(pdf, `Quote-${updatedJob.invoice_number || updatedJob.id}-${updatedJob.customer.name}.pdf`)
     } catch (error) {
       console.error('Error generating quote:', error)
       alert('Failed to generate quote PDF')
