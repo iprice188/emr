@@ -61,9 +61,12 @@ export default function JobDetail() {
     setGeneratingPDF(true)
 
     try {
-      // Set quote date and valid until if not already set
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
+
+      // Set quote date, valid until, and invoice number if not already set
       let updatedJob = job
-      if (!job.quote_date || ['draft', 'quoting'].includes(job.status)) {
+      if (!job.quote_date || !job.invoice_number || ['draft', 'quoting'].includes(job.status)) {
         const quoteDate = job.quote_date || new Date().toISOString()
         const validUntil = new Date()
         validUntil.setDate(validUntil.getDate() + 30)
@@ -71,6 +74,23 @@ export default function JobDetail() {
         const updates: Partial<Job> = {
           quote_date: quoteDate,
           quote_valid_until: validUntil.toISOString(),
+        }
+
+        // Generate invoice number if not already set
+        if (!job.invoice_number) {
+          const { data: maxNumberData } = await supabase
+            .from('jobs')
+            .select('invoice_number')
+            .eq('user_id', user.id)
+            .not('invoice_number', 'is', null)
+            .order('invoice_number', { ascending: false })
+            .limit(1)
+
+          const nextNumber = maxNumberData && maxNumberData.length > 0
+            ? (maxNumberData[0].invoice_number || 0) + 1
+            : 1001
+
+          updates.invoice_number = nextNumber
         }
 
         // Update status to quoted if currently draft or quoting
@@ -201,7 +221,12 @@ export default function JobDetail() {
         </button>
         <div className="flex-1">
           <h2 className="text-2xl font-bold">{job.title}</h2>
-          <p className="text-gray-600">{job.customer?.name}</p>
+          <p className="text-gray-600">
+            {job.customer?.name}
+            {job.invoice_number && (
+              <span className="ml-2 text-sm">• #{job.invoice_number}</span>
+            )}
+          </p>
         </div>
         <button
           onClick={() => navigate(`/jobs/${id}/edit`)}

@@ -56,6 +56,13 @@ export const generateQuotePDF = async (
   pdf.setFont('helvetica', 'bold')
   pdf.text('QUOTATION', pageWidth / 2, yPos, { align: 'center' })
 
+  // Quote Number
+  yPos += 10
+  pdf.setFontSize(12)
+  if (job.invoice_number) {
+    pdf.text(`Quote #${job.invoice_number}`, pageWidth / 2, yPos, { align: 'center' })
+  }
+
   // Customer Info
   yPos += 15
   pdf.setFontSize(12)
