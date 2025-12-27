@@ -274,10 +274,6 @@ export const generateInvoicePDF = async (
     pdf.text(`Invoice Date: ${new Date(job.invoice_date).toLocaleDateString()}`, 20, yPos)
     yPos += 6
   }
-  if (job.quote_date) {
-    pdf.text(`Quote Date: ${new Date(job.quote_date).toLocaleDateString()}`, 20, yPos)
-    yPos += 6
-  }
 
   pdf.setFont('helvetica', 'bold')
   pdf.text('For:', 20, yPos)
