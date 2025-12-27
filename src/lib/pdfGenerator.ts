@@ -23,6 +23,10 @@ export const generateQuotePDF = async (
   const pageWidth = pdf.internal.pageSize.getWidth()
   let yPos = 15
 
+  // Add black header background
+  pdf.setFillColor(0, 0, 0)
+  pdf.rect(0, 0, pageWidth, 70, 'F')
+
   // Add logo at top left (replaces business info text)
   try {
     const logoData = await loadImageAsBase64('/emr-logo.png')
@@ -33,7 +37,9 @@ export const generateQuotePDF = async (
     // Fallback to text if logo fails
     pdf.setFontSize(20)
     pdf.setFont('helvetica', 'bold')
+    pdf.setTextColor(255, 255, 255) // White text on black background
     pdf.text(settings.business_name || 'Business Name', 20, yPos)
+    pdf.setTextColor(0, 0, 0) // Reset to black
     yPos += 10
   }
 
@@ -223,6 +229,10 @@ export const generateInvoicePDF = async (
   const pageWidth = pdf.internal.pageSize.getWidth()
   let yPos = 15
 
+  // Add black header background
+  pdf.setFillColor(0, 0, 0)
+  pdf.rect(0, 0, pageWidth, 70, 'F')
+
   // Add logo at top left (replaces business info text)
   try {
     const logoData = await loadImageAsBase64('/emr-logo.png')
@@ -233,7 +243,9 @@ export const generateInvoicePDF = async (
     // Fallback to text if logo fails
     pdf.setFontSize(20)
     pdf.setFont('helvetica', 'bold')
+    pdf.setTextColor(255, 255, 255) // White text on black background
     pdf.text(settings.business_name || 'Business Name', 20, yPos)
+    pdf.setTextColor(0, 0, 0) // Reset to black
     yPos += 10
   }
 
