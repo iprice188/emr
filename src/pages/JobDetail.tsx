@@ -267,6 +267,8 @@ export default function JobDetail() {
         .replace(/{invoice_number}/g, String(job.invoice_number || ''))
         .replace(/{company_name}/g, settings.business_name || '')
         .replace(/{business_name}/g, settings.business_name || '')
+        .replace(/{total}/g, `£${(job.total || 0).toFixed(2)}`)
+        .replace(/{bank_details}/g, settings.bank_details || '')
 
       // Check if Web Share API is available
       if (navigator.share && navigator.canShare({ files: [file] })) {
