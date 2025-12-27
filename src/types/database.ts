@@ -28,6 +28,7 @@ export interface Job {
   customer_id: string
   title: string
   description?: string
+  notes?: string
   status: JobStatus
 
   // Dates
@@ -116,6 +117,7 @@ export interface JobFormData {
   customer_id: string
   title: string
   description?: string
+  notes?: string
   status?: JobStatus
   materials_notes?: string
   materials_cost?: number

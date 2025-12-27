@@ -252,6 +252,13 @@ export default function JobDetail() {
             </div>
           )}
 
+          {job.notes && (
+            <div>
+              <div className="text-gray-500 mb-1">Internal Notes</div>
+              <p className="whitespace-pre-line text-gray-700 italic">{job.notes}</p>
+            </div>
+          )}
+
           {job.job_address && (
             <div>
               <div className="text-gray-500 mb-1">Job Address</div>

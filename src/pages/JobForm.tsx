@@ -30,6 +30,7 @@ export default function JobForm() {
     customer_id: preselectedCustomer || '',
     title: '',
     description: '',
+    notes: '',
     status: 'draft' as Job['status'],
     job_address: '',
 
@@ -101,6 +102,7 @@ export default function JobForm() {
             customer_id: jobData.customer_id || '',
             title: jobData.title || '',
             description: jobData.description || '',
+            notes: jobData.notes || '',
             status: jobData.status || 'draft',
             job_address: jobData.job_address || '',
             quote_date: jobData.quote_date || '',
@@ -336,13 +338,24 @@ export default function JobForm() {
             </div>
 
             <div>
-              <label className="label">Description</label>
+              <label className="label">Description (appears on quote)</label>
               <textarea
                 className="input"
                 rows={3}
                 value={formData.description}
                 onChange={(e) => updateField('description', e.target.value)}
                 placeholder="Brief description of the work..."
+              />
+            </div>
+
+            <div>
+              <label className="label">Internal Notes (private)</label>
+              <textarea
+                className="input"
+                rows={3}
+                value={formData.notes}
+                onChange={(e) => updateField('notes', e.target.value)}
+                placeholder="Your private notes about this job..."
               />
             </div>
 
