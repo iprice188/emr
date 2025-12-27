@@ -21,7 +21,7 @@ export default function Layout() {
             <img
               src="/emr-logo.png"
               alt="EMR"
-              className="h-16 w-auto"
+              className="w-48 h-auto"
             />
             <button
               onClick={handleSignOut}
