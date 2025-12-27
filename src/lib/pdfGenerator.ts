@@ -21,7 +21,7 @@ export const generateQuotePDF = async (
 ) => {
   const pdf = new jsPDF()
   const pageWidth = pdf.internal.pageSize.getWidth()
-  let yPos = 15
+  let yPos = 10
 
   // Add black header background with gradient fade
   pdf.setFillColor(0, 0, 0)
@@ -38,7 +38,7 @@ export const generateQuotePDF = async (
   try {
     const logoData = await loadImageAsBase64('/emr-logo.png')
     pdf.addImage(logoData, 'PNG', 20, yPos, 60, 0) // 60mm wide, auto height
-    yPos += 50 // Space after logo
+    yPos = 65 // Position after header and gradient
   } catch (error) {
     console.error('Failed to load logo:', error)
     // Fallback to text if logo fails
@@ -234,7 +234,7 @@ export const generateInvoicePDF = async (
 ) => {
   const pdf = new jsPDF()
   const pageWidth = pdf.internal.pageSize.getWidth()
-  let yPos = 15
+  let yPos = 10
 
   // Add black header background with gradient fade
   pdf.setFillColor(0, 0, 0)
@@ -251,7 +251,7 @@ export const generateInvoicePDF = async (
   try {
     const logoData = await loadImageAsBase64('/emr-logo.png')
     pdf.addImage(logoData, 'PNG', 20, yPos, 60, 0) // 60mm wide, auto height
-    yPos += 50 // Space after logo
+    yPos = 65 // Position after header and gradient
   } catch (error) {
     console.error('Failed to load logo:', error)
     // Fallback to text if logo fails
