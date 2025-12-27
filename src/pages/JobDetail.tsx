@@ -86,9 +86,12 @@ export default function JobDetail() {
             .order('invoice_number', { ascending: false })
             .limit(1)
 
-          const nextNumber = maxNumberData && maxNumberData.length > 0
-            ? (maxNumberData[0].invoice_number || 0) + 1
-            : 1001
+          const maxNumber = maxNumberData && maxNumberData.length > 0
+            ? maxNumberData[0].invoice_number || 0
+            : 0
+
+          // Ensure we start from 1001 minimum
+          const nextNumber = Math.max(maxNumber + 1, 1001)
 
           updates.invoice_number = nextNumber
         }
