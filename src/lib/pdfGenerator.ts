@@ -27,7 +27,7 @@ export const generateQuotePDF = async (
   try {
     const logoData = await loadImageAsBase64('/emr-logo.png')
     pdf.addImage(logoData, 'PNG', 20, yPos, 60, 0) // 60mm wide, auto height
-    yPos += 25 // Space after logo
+    yPos += 50 // Space after logo
   } catch (error) {
     console.error('Failed to load logo:', error)
     // Fallback to text if logo fails
@@ -38,7 +38,7 @@ export const generateQuotePDF = async (
   }
 
   // Title
-  yPos += 10
+  yPos += 15
   pdf.setFontSize(24)
   pdf.setFont('helvetica', 'bold')
   pdf.text('QUOTATION', pageWidth / 2, yPos, { align: 'center' })
@@ -228,7 +228,7 @@ export const generateInvoicePDF = async (
   try {
     const logoData = await loadImageAsBase64('/emr-logo.png')
     pdf.addImage(logoData, 'PNG', 20, yPos, 60, 0) // 60mm wide, auto height
-    yPos += 25 // Space after logo
+    yPos += 50 // Space after logo
   } catch (error) {
     console.error('Failed to load logo:', error)
     // Fallback to text if logo fails
@@ -239,7 +239,7 @@ export const generateInvoicePDF = async (
   }
 
   // Title
-  yPos += 10
+  yPos += 15
   pdf.setFontSize(24)
   pdf.setFont('helvetica', 'bold')
   pdf.text('INVOICE', pageWidth / 2, yPos, { align: 'center' })
