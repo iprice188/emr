@@ -133,8 +133,42 @@ export default function JobDetail() {
     setGeneratingPDF(true)
 
     try {
-      const pdf = await generateInvoicePDF(job, settings)
-      downloadPDF(pdf, `Invoice-${job.invoice_number || job.id}-${job.customer.name}.pdf`)
+      // Set invoice date and status if needed
+      let updatedJob = job
+      if (!job.invoice_date || job.status !== 'invoiced') {
+        const updates: Partial<Job> = {}
+
+        // Set invoice date if not already set
+        if (!job.invoice_date) {
+          updates.invoice_date = new Date().toISOString()
+        }
+
+        // Update status to invoiced if not already paid
+        if (job.status !== 'paid') {
+          updates.status = 'invoiced'
+        }
+
+        if (Object.keys(updates).length > 0) {
+          const { data, error } = await supabase
+            .from('jobs')
+            .update(updates)
+            .eq('id', job.id)
+            .select(`
+              *,
+              customer:customers(*)
+            `)
+            .single()
+
+          if (error) throw error
+          if (data) {
+            updatedJob = data as JobWithCustomer
+            setJob(updatedJob)
+          }
+        }
+      }
+
+      const pdf = await generateInvoicePDF(updatedJob, settings)
+      downloadPDF(pdf, `Invoice-${updatedJob.invoice_number || updatedJob.id}-${updatedJob.customer.name}.pdf`)
     } catch (error) {
       console.error('Error generating invoice:', error)
       alert('Failed to generate invoice PDF')
@@ -251,23 +285,57 @@ export default function JobDetail() {
     setGeneratingPDF(true)
 
     try {
-      const pdf = await generateInvoicePDF(job, settings)
+      // Set invoice date and status if needed
+      let updatedJob = job
+      if (!job.invoice_date || job.status !== 'invoiced') {
+        const updates: Partial<Job> = {}
+
+        // Set invoice date if not already set
+        if (!job.invoice_date) {
+          updates.invoice_date = new Date().toISOString()
+        }
+
+        // Update status to invoiced if not already paid
+        if (job.status !== 'paid') {
+          updates.status = 'invoiced'
+        }
+
+        if (Object.keys(updates).length > 0) {
+          const { data, error } = await supabase
+            .from('jobs')
+            .update(updates)
+            .eq('id', job.id)
+            .select(`
+              *,
+              customer:customers(*)
+            `)
+            .single()
+
+          if (error) throw error
+          if (data) {
+            updatedJob = data as JobWithCustomer
+            setJob(updatedJob)
+          }
+        }
+      }
+
+      const pdf = await generateInvoicePDF(updatedJob, settings)
       const blob = pdf.output('blob')
-      const filename = `Invoice-${job.invoice_number || job.id}-${job.customer.name}.pdf`
+      const filename = `Invoice-${updatedJob.invoice_number || updatedJob.id}-${updatedJob.customer.name}.pdf`
       const file = new File([blob], filename, { type: 'application/pdf' })
 
       // Use message template with placeholder replacement or default
       let message = settings.invoice_message_template ||
-        `Hi ${job.customer.name},\n\nPlease find attached your invoice #${job.invoice_number}.\n\nBest regards`
+        `Hi ${updatedJob.customer.name},\n\nPlease find attached your invoice #${updatedJob.invoice_number}.\n\nBest regards`
 
       // Replace placeholders
       message = message
-        .replace(/{customer_name}/g, job.customer.name)
-        .replace(/{job_title}/g, job.title)
-        .replace(/{invoice_number}/g, String(job.invoice_number || ''))
+        .replace(/{customer_name}/g, updatedJob.customer.name)
+        .replace(/{job_title}/g, updatedJob.title)
+        .replace(/{invoice_number}/g, String(updatedJob.invoice_number || ''))
         .replace(/{company_name}/g, settings.business_name || '')
         .replace(/{business_name}/g, settings.business_name || '')
-        .replace(/{total}/g, `£${(job.total || 0).toFixed(2)}`)
+        .replace(/{total}/g, `£${(updatedJob.total || 0).toFixed(2)}`)
         .replace(/{bank_details}/g, settings.bank_details || '')
 
       // Check if Web Share API is available
