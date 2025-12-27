@@ -21,43 +21,20 @@ export const generateQuotePDF = async (
 ) => {
   const pdf = new jsPDF()
   const pageWidth = pdf.internal.pageSize.getWidth()
-  let yPos = 20
+  let yPos = 15
 
-  // Add logo at top right
+  // Add logo at top left (replaces business info text)
   try {
     const logoData = await loadImageAsBase64('/emr-logo.png')
-    pdf.addImage(logoData, 'PNG', pageWidth - 60, 10, 50, 0) // Auto height
+    pdf.addImage(logoData, 'PNG', 20, yPos, 60, 0) // 60mm wide, auto height
+    yPos += 25 // Space after logo
   } catch (error) {
     console.error('Failed to load logo:', error)
-  }
-
-  // Header - Business Info
-  pdf.setFontSize(20)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(settings.business_name || 'Business Name', 20, yPos)
-
-  pdf.setFontSize(10)
-  pdf.setFont('helvetica', 'normal')
-  yPos += 8
-
-  if (settings.contact_name) {
-    pdf.text(settings.contact_name, 20, yPos)
-    yPos += 5
-  }
-  if (settings.phone) {
-    pdf.text(settings.phone, 20, yPos)
-    yPos += 5
-  }
-  if (settings.email) {
-    pdf.text(settings.email, 20, yPos)
-    yPos += 5
-  }
-  if (settings.address) {
-    const addressLines = settings.address.split('\n')
-    addressLines.forEach(line => {
-      pdf.text(line, 20, yPos)
-      yPos += 5
-    })
+    // Fallback to text if logo fails
+    pdf.setFontSize(20)
+    pdf.setFont('helvetica', 'bold')
+    pdf.text(settings.business_name || 'Business Name', 20, yPos)
+    yPos += 10
   }
 
   // Title
@@ -245,43 +222,20 @@ export const generateInvoicePDF = async (
 ) => {
   const pdf = new jsPDF()
   const pageWidth = pdf.internal.pageSize.getWidth()
-  let yPos = 20
+  let yPos = 15
 
-  // Add logo at top right
+  // Add logo at top left (replaces business info text)
   try {
     const logoData = await loadImageAsBase64('/emr-logo.png')
-    pdf.addImage(logoData, 'PNG', pageWidth - 60, 10, 50, 0) // Auto height
+    pdf.addImage(logoData, 'PNG', 20, yPos, 60, 0) // 60mm wide, auto height
+    yPos += 25 // Space after logo
   } catch (error) {
     console.error('Failed to load logo:', error)
-  }
-
-  // Header - Business Info
-  pdf.setFontSize(20)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(settings.business_name || 'Business Name', 20, yPos)
-
-  pdf.setFontSize(10)
-  pdf.setFont('helvetica', 'normal')
-  yPos += 8
-
-  if (settings.contact_name) {
-    pdf.text(settings.contact_name, 20, yPos)
-    yPos += 5
-  }
-  if (settings.phone) {
-    pdf.text(settings.phone, 20, yPos)
-    yPos += 5
-  }
-  if (settings.email) {
-    pdf.text(settings.email, 20, yPos)
-    yPos += 5
-  }
-  if (settings.address) {
-    const addressLines = settings.address.split('\n')
-    addressLines.forEach(line => {
-      pdf.text(line, 20, yPos)
-      yPos += 5
-    })
+    // Fallback to text if logo fails
+    pdf.setFontSize(20)
+    pdf.setFont('helvetica', 'bold')
+    pdf.text(settings.business_name || 'Business Name', 20, yPos)
+    yPos += 10
   }
 
   // Title
