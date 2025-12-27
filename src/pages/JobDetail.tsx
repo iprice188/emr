@@ -221,6 +221,8 @@ export default function JobDetail() {
         .replace(/{job_title}/g, updatedJob.title)
         .replace(/{quote_number}/g, String(updatedJob.invoice_number || ''))
         .replace(/{expiry_date}/g, expiryDate)
+        .replace(/{company_name}/g, settings.business_name || '')
+        .replace(/{business_name}/g, settings.business_name || '')
 
       // Check if Web Share API is available
       if (navigator.share && navigator.canShare({ files: [file] })) {
@@ -263,6 +265,8 @@ export default function JobDetail() {
         .replace(/{customer_name}/g, job.customer.name)
         .replace(/{job_title}/g, job.title)
         .replace(/{invoice_number}/g, String(job.invoice_number || ''))
+        .replace(/{company_name}/g, settings.business_name || '')
+        .replace(/{business_name}/g, settings.business_name || '')
 
       // Check if Web Share API is available
       if (navigator.share && navigator.canShare({ files: [file] })) {
