@@ -23,9 +23,16 @@ export const generateQuotePDF = async (
   const pageWidth = pdf.internal.pageSize.getWidth()
   let yPos = 15
 
-  // Add black header background
+  // Add black header background with gradient fade
   pdf.setFillColor(0, 0, 0)
-  pdf.rect(0, 0, pageWidth, 70, 'F')
+  pdf.rect(0, 0, pageWidth, 50, 'F')
+
+  // Create gradient fade from black to white
+  for (let i = 0; i < 15; i++) {
+    const gray = Math.floor((i / 15) * 255)
+    pdf.setFillColor(gray, gray, gray)
+    pdf.rect(0, 50 + i, pageWidth, 1, 'F')
+  }
 
   // Add logo at top left (replaces business info text)
   try {
@@ -229,9 +236,16 @@ export const generateInvoicePDF = async (
   const pageWidth = pdf.internal.pageSize.getWidth()
   let yPos = 15
 
-  // Add black header background
+  // Add black header background with gradient fade
   pdf.setFillColor(0, 0, 0)
-  pdf.rect(0, 0, pageWidth, 70, 'F')
+  pdf.rect(0, 0, pageWidth, 50, 'F')
+
+  // Create gradient fade from black to white
+  for (let i = 0; i < 15; i++) {
+    const gray = Math.floor((i / 15) * 255)
+    pdf.setFillColor(gray, gray, gray)
+    pdf.rect(0, 50 + i, pageWidth, 1, 'F')
+  }
 
   // Add logo at top left (replaces business info text)
   try {
