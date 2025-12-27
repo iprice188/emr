@@ -206,9 +206,21 @@ export default function JobDetail() {
       const filename = `Quote-${updatedJob.invoice_number || updatedJob.id}-${updatedJob.customer.name}.pdf`
       const file = new File([blob], filename, { type: 'application/pdf' })
 
-      // Use message template or default
-      const message = settings.quote_message_template ||
+      // Calculate expiry date
+      const expiryDate = updatedJob.quote_valid_until
+        ? new Date(updatedJob.quote_valid_until).toLocaleDateString()
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
+
+      // Use message template with placeholder replacement or default
+      let message = settings.quote_message_template ||
         `Hi ${updatedJob.customer.name},\n\nPlease find attached your quote #${updatedJob.invoice_number}.\n\nBest regards`
+
+      // Replace placeholders
+      message = message
+        .replace(/{customer_name}/g, updatedJob.customer.name)
+        .replace(/{job_title}/g, updatedJob.title)
+        .replace(/{quote_number}/g, String(updatedJob.invoice_number || ''))
+        .replace(/{expiry_date}/g, expiryDate)
 
       // Check if Web Share API is available
       if (navigator.share && navigator.canShare({ files: [file] })) {
@@ -242,9 +254,15 @@ export default function JobDetail() {
       const filename = `Invoice-${job.invoice_number || job.id}-${job.customer.name}.pdf`
       const file = new File([blob], filename, { type: 'application/pdf' })
 
-      // Use message template or default
-      const message = settings.invoice_message_template ||
+      // Use message template with placeholder replacement or default
+      let message = settings.invoice_message_template ||
         `Hi ${job.customer.name},\n\nPlease find attached your invoice #${job.invoice_number}.\n\nBest regards`
+
+      // Replace placeholders
+      message = message
+        .replace(/{customer_name}/g, job.customer.name)
+        .replace(/{job_title}/g, job.title)
+        .replace(/{invoice_number}/g, String(job.invoice_number || ''))
 
       // Check if Web Share API is available
       if (navigator.share && navigator.canShare({ files: [file] })) {
@@ -377,56 +395,46 @@ export default function JobDetail() {
       </div>
 
       {/* Quick Actions */}
-      <div className="space-y-4 mb-6">
+      <div className="grid grid-cols-2 gap-3 mb-6">
         <div>
-          <h3 className="text-sm font-semibold text-gray-600 mb-2">Quote</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleGenerateQuote}
-              className="btn-secondary text-sm py-3"
+              className="btn-primary text-sm py-3 flex-1"
               disabled={generatingPDF || !settings}
             >
-              {generatingPDF ? 'Working...' : '📄 Download'}
+              {generatingPDF ? 'Working...' : '📄 Quote'}
             </button>
             <button
               onClick={handleShareQuote}
-              className="btn-primary text-sm py-3 flex items-center justify-center gap-2"
+              className="btn-primary text-sm py-3 px-3"
               disabled={generatingPDF || !settings}
+              title="Share quote"
             >
-              {generatingPDF ? 'Working...' : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                  Share
-                </>
-              )}
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
             </button>
           </div>
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-gray-600 mb-2">Invoice</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleGenerateInvoice}
-              className="btn-secondary text-sm py-3"
+              className="btn-primary text-sm py-3 flex-1"
               disabled={generatingPDF || !settings}
             >
-              {generatingPDF ? 'Working...' : '🧾 Download'}
+              {generatingPDF ? 'Working...' : '🧾 Invoice'}
             </button>
             <button
               onClick={handleShareInvoice}
-              className="btn-primary text-sm py-3 flex items-center justify-center gap-2"
+              className="btn-primary text-sm py-3 px-3"
               disabled={generatingPDF || !settings}
+              title="Share invoice"
             >
-              {generatingPDF ? 'Working...' : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                  Share
-                </>
-              )}
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
             </button>
           </div>
         </div>
