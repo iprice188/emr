@@ -143,6 +143,131 @@ export default function JobDetail() {
     }
   }
 
+  const handleShareQuote = async () => {
+    if (!job || !settings) return
+    setGeneratingPDF(true)
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
+
+      // Set quote date, valid until, and invoice number if needed (same as generate)
+      let updatedJob = job
+      if (!job.quote_date || !job.invoice_number || ['draft', 'quoting'].includes(job.status)) {
+        const quoteDate = job.quote_date || new Date().toISOString()
+        const validUntil = new Date()
+        validUntil.setDate(validUntil.getDate() + 30)
+
+        const updates: Partial<Job> = {
+          quote_date: quoteDate,
+          quote_valid_until: validUntil.toISOString(),
+        }
+
+        if (!job.invoice_number) {
+          const { data: maxNumberData } = await supabase
+            .from('jobs')
+            .select('invoice_number')
+            .eq('user_id', user.id)
+            .not('invoice_number', 'is', null)
+            .order('invoice_number', { ascending: false })
+            .limit(1)
+
+          const maxNumber = maxNumberData && maxNumberData.length > 0
+            ? maxNumberData[0].invoice_number || 0
+            : 0
+
+          const nextNumber = Math.max(maxNumber + 1, 1001)
+          updates.invoice_number = nextNumber
+        }
+
+        if (['draft', 'quoting'].includes(job.status)) {
+          updates.status = 'quoted'
+        }
+
+        const { data, error } = await supabase
+          .from('jobs')
+          .update(updates)
+          .eq('id', job.id)
+          .select(`
+            *,
+            customer:customers(*)
+          `)
+          .single()
+
+        if (error) throw error
+        if (data) {
+          updatedJob = data as JobWithCustomer
+          setJob(updatedJob)
+        }
+      }
+
+      const pdf = await generateQuotePDF(updatedJob, settings)
+      const blob = pdf.output('blob')
+      const filename = `Quote-${updatedJob.invoice_number || updatedJob.id}-${updatedJob.customer.name}.pdf`
+      const file = new File([blob], filename, { type: 'application/pdf' })
+
+      // Use message template or default
+      const message = settings.quote_message_template ||
+        `Hi ${updatedJob.customer.name},\n\nPlease find attached your quote #${updatedJob.invoice_number}.\n\nBest regards`
+
+      // Check if Web Share API is available
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: `Quote #${updatedJob.invoice_number}`,
+          text: message,
+          files: [file],
+        })
+      } else {
+        // Fallback to download
+        downloadPDF(pdf, filename)
+        alert('Share not available on this device. PDF downloaded instead.')
+      }
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Error sharing quote:', error)
+        alert('Failed to share quote')
+      }
+    } finally {
+      setGeneratingPDF(false)
+    }
+  }
+
+  const handleShareInvoice = async () => {
+    if (!job || !settings) return
+    setGeneratingPDF(true)
+
+    try {
+      const pdf = await generateInvoicePDF(job, settings)
+      const blob = pdf.output('blob')
+      const filename = `Invoice-${job.invoice_number || job.id}-${job.customer.name}.pdf`
+      const file = new File([blob], filename, { type: 'application/pdf' })
+
+      // Use message template or default
+      const message = settings.invoice_message_template ||
+        `Hi ${job.customer.name},\n\nPlease find attached your invoice #${job.invoice_number}.\n\nBest regards`
+
+      // Check if Web Share API is available
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: `Invoice #${job.invoice_number}`,
+          text: message,
+          files: [file],
+        })
+      } else {
+        // Fallback to download
+        downloadPDF(pdf, filename)
+        alert('Share not available on this device. PDF downloaded instead.')
+      }
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Error sharing invoice:', error)
+        alert('Failed to share invoice')
+      }
+    } finally {
+      setGeneratingPDF(false)
+    }
+  }
+
   const handleDelete = async () => {
     if (!id) return
     setDeleting(true)
@@ -252,21 +377,45 @@ export default function JobDetail() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <button
-          onClick={handleGenerateQuote}
-          className="btn-primary text-sm py-3"
-          disabled={generatingPDF || !settings}
-        >
-          {generatingPDF ? 'Generating...' : '📄 Generate Quote'}
-        </button>
-        <button
-          onClick={handleGenerateInvoice}
-          className="btn-primary text-sm py-3"
-          disabled={generatingPDF || !settings}
-        >
-          {generatingPDF ? 'Generating...' : '🧾 Generate Invoice'}
-        </button>
+      <div className="space-y-4 mb-6">
+        <div>
+          <h3 className="text-sm font-semibold text-gray-600 mb-2">Quote</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={handleGenerateQuote}
+              className="btn-secondary text-sm py-3"
+              disabled={generatingPDF || !settings}
+            >
+              {generatingPDF ? 'Working...' : '📄 Download'}
+            </button>
+            <button
+              onClick={handleShareQuote}
+              className="btn-primary text-sm py-3"
+              disabled={generatingPDF || !settings}
+            >
+              {generatingPDF ? 'Working...' : '📤 Share'}
+            </button>
+          </div>
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-gray-600 mb-2">Invoice</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={handleGenerateInvoice}
+              className="btn-secondary text-sm py-3"
+              disabled={generatingPDF || !settings}
+            >
+              {generatingPDF ? 'Working...' : '🧾 Download'}
+            </button>
+            <button
+              onClick={handleShareInvoice}
+              className="btn-primary text-sm py-3"
+              disabled={generatingPDF || !settings}
+            >
+              {generatingPDF ? 'Working...' : '📤 Share'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Job Info */}
